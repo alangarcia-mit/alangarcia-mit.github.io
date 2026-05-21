@@ -1,0 +1,289 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMG Detection Circuit - Alan Garcia</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+        
+        header {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .project-meta {
+            color: #7f8c8d;
+            font-size: 1em;
+            margin-bottom: 15px;
+        }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .skill-tag {
+            background: #ecf0f1;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        
+        section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h3 {
+            color: #34495e;
+            margin: 20px 0 10px 0;
+        }
+        p { margin-bottom: 15px; }
+        
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .image-gallery img {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            cursor: pointer;
+        }
+        .image-caption {
+            text-align: center;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 5px;
+        }
+        
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .video-container iframe,
+        .video-container video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 8px;
+        }
+        
+        ul { margin-left: 20px; margin-top: 10px; margin-bottom: 15px; }
+        
+        .download-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .download-link:hover {
+            background: #1a252f;
+        }
+        
+        .specs-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        .specs-table th, .specs-table td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .specs-table th {
+            background: #ecf0f1;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+    
+    <header>
+        <h1>EMG Muscle Activity Detection Circuit</h1>
+        <p class="project-meta">Spring 2025 | MIT 6.2040 Analog Electronics Laboratory | Team Project</p>
+        
+        <div class="skills">
+            <span class="skill-tag">Instrumentation Amplifiers</span>
+            <span class="skill-tag">Active Filters</span>
+            <span class="skill-tag">LTSpice</span>
+            <span class="skill-tag">Biopotential Signals</span>
+            <span class="skill-tag">Sallen-Key Topology</span>
+            <span class="skill-tag">Single-Supply Design</span>
+        </div>
+    </header>
+
+    <section>
+        <h2>Project Overview</h2>
+        <p>
+            Electromyography (EMG) is the technique of measuring the small electrical signals produced by muscle contractions. These signals, typically in the range of [50µV to 5mV], require significant amplification and careful filtering to be useful for detection or control applications. EMG circuits are used in prosthetics, biomedical research, human-machine interfaces, and clinical diagnostics.
+        </p>
+        <p>
+            For my MIT 6.2040 Analog Electronics Laboratory final project, my partner and I designed a complete, fully-analog EMG detection system. The circuit takes raw biopotential signals from surface electrodes, amplifies and filters them, and produces a clean signal that triggers visual feedback (LEDs) when muscle activity is detected.
+        </p>
+        <p>
+            <strong>My contribution:</strong> I designed and built the signal acquisition and processing stage - the first half of the circuit responsible for amplifying the small input signals, rejecting common-mode noise, and filtering out interference. My partner designed the second half, which compared the processed signal against different voltage thresholds to drive the LED output.
+        </p>
+    </section>
+
+    <section>
+        <h2>Demonstration Video</h2>
+        <!-- OPTION 1: If hosting video file directly in repo (must be under 25MB) -->
+        <div class="video-container">
+            <video controls>
+                <source src="../videos/emg-demo.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        
+        <!-- OPTION 2: If using YouTube (uncomment and replace VIDEO_ID with your YouTube video ID) -->
+        <!--
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/VIDEO_ID" 
+                    title="EMG Circuit Demo" 
+                    frameborder="0" 
+                    allowfullscreen></iframe>
+        </div>
+        -->
+        
+        <p>The video shows the circuit detecting muscle contractions from surface electrodes placed on my forearm. As I flex, the amplified and filtered EMG signal triggers the comparator stage, lighting LEDs proportional to muscle activity intensity.</p>
+    </section>
+
+    <section>
+        <h2>Technical Implementation</h2>
+        
+        <h3>Signal Acquisition Stage (My Work)</h3>
+        <p>The input stage faces several core challenges in EMG measurement:</p>
+        <ul>
+            <li><strong>Small signal levels:</strong> Raw EMG signals are typically [50µV to 5mV] - requiring high amplification</li>
+            <li><strong>Power line interference:</strong> 60Hz noise from electrical wiring couples capacitively into the body and electrodes</li>
+            <li><strong>Motion artifacts:</strong> Low-frequency noise from electrode movement on skin</li>
+            <li><strong>DC offset:</strong> Electrode-skin interface creates DC voltages that must be removed</li>
+        </ul>
+        
+        <h3>Design Approach</h3>
+        <p>I designed a multi-stage analog signal chain:</p>
+        <ul>
+            <li><strong>Stage 1 - Instrumentation Amplifier:</strong> [Three op-amp topology / INA128 / specific op-amp you used] providing differential input with high common-mode rejection. Initial gain of [your gain value, e.g., 100×] to amplify signals above noise floor.</li>
+            <li><strong>Stage 2 - High-Pass Filter:</strong> [Cutoff frequency, e.g., 10Hz] to remove DC electrode offset and motion artifacts while preserving EMG frequency content.</li>
+            <li><strong>Stage 3 - Low-Pass Filter:</strong> Sallen-Key topology with [cutoff frequency, e.g., 500Hz] cutoff to remove high-frequency noise and aliasing.</li>
+            <li><strong>Stage 4 - Final Amplification:</strong> Additional gain stage bringing total system gain to [total gain, e.g., 1000×].</li>
+            <li><strong>Single-supply design:</strong> Implemented virtual ground reference to operate from a single 9V battery, eliminating need for dual supplies.</li>
+        </ul>
+        
+        <h3>Key Specifications</h3>
+        <table class="specs-table">
+            <tr>
+                <th>Parameter</th>
+                <th>Specification</th>
+            </tr>
+            <tr>
+                <td>Total Gain</td>
+                <td>[Your value, e.g., 1000× or 60dB]</td>
+            </tr>
+            <tr>
+                <td>Bandwidth</td>
+                <td>[Your range, e.g., 10Hz - 500Hz]</td>
+            </tr>
+            <tr>
+                <td>CMRR</td>
+                <td>[Your value, e.g., >80dB]</td>
+            </tr>
+            <tr>
+                <td>Power Supply</td>
+                <td>Single 9V battery</td>
+            </tr>
+            <tr>
+                <td>Input Impedance</td>
+                <td>[Your value]</td>
+            </tr>
+        </table>
+    </section>
+
+    <section>
+        <h2>Photos & Schematics</h2>
+        <div class="image-gallery">
+            <div>
+                <img src="../images/emg-circuit.jpg" alt="Complete EMG circuit on breadboard">
+                <p class="image-caption">Complete circuit assembled on breadboard</p>
+            </div>
+            <div>
+                <img src="../images/emg-schematic.png" alt="Circuit schematic">
+                <p class="image-caption">Schematic of signal acquisition stage</p>
+            </div>
+            <div>
+                <img src="../images/emg-scope.jpg" alt="Oscilloscope showing EMG signal">
+                <p class="image-caption">Oscilloscope capture of detected EMG signal</p>
+            </div>
+            <!-- Add more images as needed by copying the div above -->
+        </div>
+    </section>
+
+    <section>
+        <h2>Challenges & Lessons Learned</h2>
+        <p>
+            [Write 2-3 paragraphs about challenges you faced and solved. Examples:]
+        </p>
+        <p>
+            <strong>60Hz Interference:</strong> Initial testing showed significant 60Hz power line interference dominating the signal. I addressed this by carefully designing the filter response and ensuring proper instrumentation amplifier implementation for maximum common-mode rejection. [Add specific details about what you did.]
+        </p>
+        <p>
+            <strong>Virtual Ground Stability:</strong> Operating from a single supply required creating a stable virtual ground reference. [Describe what you learned about virtual ground design and any issues you had to debug.]
+        </p>
+        <p>
+            <strong>Gain Distribution:</strong> Achieving 1000× total gain in a single stage causes saturation and amplifies offset issues. I learned to distribute gain across multiple stages with appropriate filtering between them, which is a fundamental principle of practical analog design that I'll carry into future projects.
+        </p>
+    </section>
+
+    <section>
+        <h2>Full Project Report</h2>
+        <p>The complete project report covers both the signal acquisition stage (my work) and the comparator/threshold detection stage (my partner's work), along with full schematics, simulation results, measurements, and analysis.</p>
+        <a href="../documents/emg-report.pdf" class="download-link" target="_blank">Download Full Report (PDF)</a>
+    </section>
+
+    <a href="../index.html" class="back-link">← Back to Portfolio</a>
+</body>
+</html>
