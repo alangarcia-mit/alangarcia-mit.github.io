@@ -411,17 +411,17 @@
 
         <h3>60 Hz dominated everything until the notch worked</h3>
         <p>
-            Before the active Twin-T was functioning, mains pickup was very visible on the scope at every probe point past the second gain stage &mdash; unsurprising in hindsight, since 1,600&times; of gain sits ahead of the notch and amplifies whatever common-mode interference the front end fails to reject. Twisted-pair electrode leads and routing them away from the bench power strip helped at the margin. The notch itself was the actual fix.
+            Before the active Twin-T was functioning, mains pickup was very visible on the scope at every probe point past the second gain stage (unsurprising in hindsight, since 1,600&times; of gain sits ahead of the notch and amplifies whatever common-mode interference the front end fails to reject). Twisted-pair electrode leads and routing them away from the bench power strip helped at the margin. The notch itself was the actual fix.
         </p>
 
         <h3>On a single supply, "ground" is a design decision, not a default</h3>
         <p>
-            Several stages that simulated correctly behaved erratically on the bench because a node that should have referenced the 4.5&nbsp;V virtual ground had been wired to actual ground instead. The symptom was consistent and unhelpful: the output stuck at 0&nbsp;V or saturated at 9&nbsp;V regardless of input. The fix was almost always the same &mdash; trace every node back to its reference and confirm that AC paths terminate at V_GND, not at GND. This was the single most repeated mistake in the build, and the lesson generalizes: in single-supply design, every "ground" symbol on a schematic is a question, not an answer.
+            Several stages that simulated correctly behaved erratically on the bench because a node that should have referenced the 4.5&nbsp;V virtual ground had been wired to actual ground instead. The symptom was consistent and unhelpful: the output stuck at 0&nbsp;V or saturated at 9&nbsp;V regardless of input. The fix was almost always the same: trace every node back to its reference and confirm that AC paths terminate at V_GND, not at GND.
         </p>
 
         <h3>Twin-T notches are unforgiving of component mismatch</h3>
         <p>
-            The first build notched at roughly 55&nbsp;Hz with noticeably shallow attenuation. Both the center frequency and the depth of a Twin-T depend on tight matching between the R and C pairs, and standard-tolerance parts were not good enough. Without access to precision components, I measured individual parts and hand-selected the closest-matching set, which pulled the center back to ~59&nbsp;Hz and deepened the notch past 30&nbsp;dB. This was the clearest instance of a broader pattern in this build: every block that depended on component matching showed a persistent gap between the theoretical result and what actually appeared on the scope.
+            The first build notched at roughly 55&nbsp;Hz with noticeably shallow and bad attenuation (The first iteration also used a passive notch filter which didn't help). Both the center frequency and the depth of a Twin-T depend on tight matching between the R and C pairs, and standard-tolerance parts were not good enough. Without access to precision components, I measured individual parts and hand-selected the closest-matching set, which pulled the center back to ~59&nbsp;Hz and deepened the notch past 30&nbsp;dB. 
         </p>
     </section>
 
@@ -434,12 +434,12 @@
             The single biggest improvement would be replacing the discrete one-op-amp difference amplifier with an integrated instrumentation amplifier &mdash; an AD620, INA128, or INA333. The discrete topology tops out around 80&nbsp;dB CMRR, and only if the 10&nbsp;k&Omega; and 1&nbsp;M&Omega; pairs are matched to better than 0.1%. The build used 5% resistors, so the real front-end CMRR was almost certainly well short of that, and the resulting 60&nbsp;Hz common-mode-to-differential conversion was a meaningful contributor to the mains pickup the notch then had to clean up.
         </p>
         <p>
-            An AD620 specifies 100&nbsp;dB CMRR at 60&nbsp;Hz with a single external gain-setting resistor, and its input impedance is on the order of 10&nbsp;G&Omega; rather than the ~10&nbsp;k&Omega; my discrete stage presents &mdash; which matters, because skin-electrode contact impedance ranges from tens of k&Omega; to around 1&nbsp;M&Omega;. The higher input impedance would also let me drop or greatly reduce the 10&nbsp;k&Omega; input resistors, lowering their Johnson noise contribution at the most sensitive point in the chain. The trade-offs are cost, and the loss of pedagogical clarity: a monolithic INA is a black box, whereas the discrete topology makes the CMRR-matching network visible and adjustable.
+            An AD620 specifies 100&nbsp;dB CMRR at 60&nbsp;Hz with a single external gain-setting resistor, and its input impedance is on the order of 10&nbsp;G&Omega; rather than the ~10&nbsp;k&Omega; my discrete stage presents, which matters, because skin-electrode contact impedance ranges from tens of k&Omega; to around 1&nbsp;M&Omega;. The higher input impedance would also let me drop or greatly reduce the 10&nbsp;k&Omega; input resistors, lowering their Johnson noise contribution at the most sensitive point in the chain. The trade-offs are cost, and the loss of pedagogical clarity: a monolithic INA is a black box, whereas the discrete topology makes the CMRR-matching network visible and adjustable.
         </p>
 
         <h3>2. Shielded electrode cables</h3>
         <p>
-            The leads in the current build are unshielded alligator-clip jumper wires. Capacitive coupling from nearby mains-powered equipment into these leads was, in my estimation, the largest single contributor to 60&nbsp;Hz pickup. Shielded cable with the shield driven at the common-mode potential &mdash; a guarded or driven-shield configuration &mdash; would substantially reduce that coupling, and it is close to free in parts cost.
+            The leads in the current build are unshielded alligator-clip jumper wires. Capacitive coupling from nearby mains-powered equipment into these leads was, in my estimation, the largest single contributor to 60&nbsp;Hz pickup. Shielded cable with the shield driven at the common-mode potential (a guarded or driven-shield configuration) would substantially reduce that coupling, and it is close to free in parts cost.
         </p>
 
         <h3>3. A PCB instead of protoboard</h3>
@@ -449,7 +449,7 @@
 
         <h3>4. Tighter component tolerances</h3>
         <p>
-            Every matched-network block in the chain &mdash; the difference amplifier, the Twin-T, the rectifier's five 10&nbsp;k&Omega; resistors &mdash; is limited by how well its components match, not by its topology. Moving to 1% resistors and 5% C0G ceramic capacitors would close most of the gap between the theoretical and measured performance without changing a single design decision.
+            Every matched-network block in the chain, the difference amplifier, the Twin-T, the rectifier's five 10&nbsp;k&Omega; resistors, is limited by how well its components match, not by its topology. Moving to 1% resistors and 5% C0G ceramic capacitors would close most of the gap between the theoretical and measured performance without changing a single design decision.
         </p>
 
     </section>
