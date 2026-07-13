@@ -372,7 +372,7 @@
         <p>Click any image to open it full size.</p>
         <div class="image-gallery">
             <div>
-                <a href="../images/emg-protoboard.jpg" target="_blank">
+                <a href="../images/emg-protoboard.png" target="_blank">
                     <img src="../images/emg-protoboard.jpg" alt="Annotated photograph of the signal cleaning chain built on protoboard, with each stage labeled">
                 </a>
                 <p class="image-caption">The chain on protoboard, with each stage labeled</p>
@@ -402,7 +402,7 @@
                 <p class="image-caption">Measured response of the MFB envelope low-pass &mdash; ~2&nbsp;Hz corner</p>
             </div>
             <div>
-                <a href="../images/emg-in-action.jpg" target="_blank">
+                <a href="../images/emg-in-action.png" target="_blank">
                     <img src="../images/emg-in-action.jpg" alt="Circuit operating: LED bar responding to contraction alongside oscilloscope output">
                 </a>
                 <p class="image-caption">Circuit in operation &mdash; LED bar and scope output across contraction states</p>
@@ -456,10 +456,6 @@
             Every matched-network block in the chain &mdash; the difference amplifier, the Twin-T, the rectifier's five 10&nbsp;k&Omega; resistors &mdash; is limited by how well its components match, not by its topology. Moving to 1% resistors and 5% C0G ceramic capacitors would close most of the gap between the theoretical and measured performance without changing a single design decision.
         </p>
 
-        <h3>5. Characterize CMRR on the bench</h3>
-        <p>
-            I designed on the assumption that the notch would handle mains, and never measured front-end CMRR directly. It is a short measurement &mdash; tie both inputs together, drive with a sine, sweep, watch the output &mdash; and it would have told me quantitatively how much the 5% resistor matching was actually costing, rather than leaving me to bound it analytically after the fact. If I revisit this circuit, that measurement comes first.
-        </p>
     </section>
 
     <section>
