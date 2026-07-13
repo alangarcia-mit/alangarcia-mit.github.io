@@ -95,35 +95,55 @@
     <section>
         <h2>Projects</h2>
         
-        <div class="project">
-            <h3>EMG Muscle Activity Detection Circuit</h3>
-            <p class="project-meta">Spring 2026 | MIT 6.2040 Analog Electronics Lab</p>
-            <p>Designed the signal cleaning and acquisition chain of a fully analog EMG detection system — distributing ~108 dB of gain across a difference-amplifier front end, active filtering (Sallen-Key high-pass, Twin-T 60 Hz notch, MFB envelope low-pass), and precision full-wave rectification to turn a µV-level biopotential into a calibrated 0–9 V contraction envelope on a single 9 V supply.</p>
-            
-            <div class="skills">
-                <span class="skill-tag">Analog Signal Chain Design</span>
-                <span class="skill-tag">Active Filters</span>
-                <span class="skill-tag">Precision Rectification</span>
-                <span class="skill-tag">Single-Supply Design</span>
-            </div>
-            
-            <a href="projects/emg.html" class="project-link">View Project Details →</a>
-            <style>
-                  .spaced-paragraph {
-                    margin-bottom: 30px; /* Adjust the pixel value to change the space gap */
-                  }
-            </style>
-            <h3>Adjustable Linear Power Supply</h3>
-            <p class="project-meta">Personal Project | In progress — expected August 2026</p>
-            <p>Designing a 0–15 V, 2 A adjustable bench supply with current limiting, foldback protection, and thermal shutdown. Currently in the design phase: requirements specification, topology selection, component-level calculations, and LTspice verification.</p>
+        <!-- HTML Structure -->
+<div class="project-container">
+  
+  <!-- Project 1 -->
+  <div class="project">
+    <h3>EMG Muscle Activity Detection Circuit</h3>
+    <p class="project-meta">Spring 2026 | MIT 6.2040 Analog Electronics Lab</p>
+    <p>Designed the signal cleaning and acquisition chain of a fully analog EMG detection system — distributing ~108 dB of gain across a difference-amplifier front end, active filtering (Sallen-Key high-pass, Twin-T 60 Hz notch, MFB envelope low-pass), and precision full-wave rectification to turn a µV-level biopotential into a calibrated 0–9 V contraction envelope on a single 9 V supply.</p>
+    
+    <div class="skills">
+        <span class="skill-tag">Analog Signal Chain Design</span>
+        <span class="skill-tag">Active Filters</span>
+        <span class="skill-tag">Precision Rectification</span>
+        <span class="skill-tag">Single-Supply Design</span>
+    </div>
+    
+    <a href="projects/emg.html" class="project-link">View Project Details →</a>
+  </div> <!-- Close Project 1 -->
 
-            <div class="skills">
-                <span class="skill-tag">Power Electronics</span>
-                <span class="skill-tag">Linear Regulation</span>
-                <span class="skill-tag">Thermal Design</span>
-                <span class="skill-tag">LTspice</span>
-            </div>
-         </div>
+  <!-- Project 2 -->
+  <div class="project">
+    <h3>Adjustable Linear Power Supply</h3>
+    <p class="project-meta">Personal Project | In progress — expected August 2026</p>
+    <p>Designing a 0–15 V, 2 A adjustable bench supply with current limiting, foldback protection, and thermal shutdown. Currently in the design phase: requirements specification, topology selection, component-level calculations, and LTspice verification.</p>
+
+    <div class="skills">
+        <span class="skill-tag">Power Electronics</span>
+        <span class="skill-tag">Linear Regulation</span>
+        <span class="skill-tag">Thermal Design</span>
+        <span class="skill-tag">LTspice</span>
+    </div>
+  </div> <!-- Close Project 2 -->
+
+</div>
+
+<!-- CSS Styling -->
+<style>
+  /* This targets every project block and creates a gap below it */
+  .project {
+    margin-bottom: 40px; /* Adjust this value to make the gap larger or smaller */
+  }
+
+  /* Keeps the link block-level so the margin applies cleanly above the next heading */
+  .project-link {
+    display: inline-block;
+    margin-bottom: 15px; 
+  }
+</style>
+
         
         
     </section>
