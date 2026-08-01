@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alan Gael Garcia - Electrical Engineering Portfolio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        header {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .subtitle { color: #7f8c8d; font-size: 1.1em; }
+        .contact { margin-top: 15px; }
+        .contact a {
+            color: #3498db;
+            text-decoration: none;
+            margin-right: 20px;
+        }
+        section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .project { margin-bottom: 30px; }
+        .project h3 { color: #34495e; margin-bottom: 10px; }
+        .project-meta { color: #7f8c8d; font-size: 0.9em; margin-bottom: 10px; }
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .skill-tag {
+            background: #ecf0f1;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+        ul { margin-left: 20px; margin-top: 10px; }
+        
+        /* NEW STYLE - for the project link button */
+        .project-link {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 8px 20px;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: background 0.2s;
+        }
+        .project-link:hover {
+            background: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Alan Gael Garcia</h1>
+        <p class="subtitle">Electrical Engineering with Computing & Business Analytics Student | MIT '28</p>
+        <div class="contact">
+            <a href="mailto:agarcia3@mit.edu">agarcia3@mit.edu</a>
+            <a href="documents/GARCIA_ALAN_RESUME.pdf" target="_blank">Resume (PDF)</a>
+        </div>
+    </header>
+
+    <section>
+        <h2>About</h2>
+        <p>I'm a rising junior at MIT studying Electrical Engineering with Computing and
+   Business Analytics. My technical background is currently primarily in analog circuit design; more recently I've been working on quantitative modeling of
+   energy markets. I'm interested in the engineering and commercial side of the energy industry
+   and in roles where engineering judgment and market reasoning overlap.</p>
+    </section>
+
+    <section>
+        <h2>Projects</h2>
+        
+        <!-- HTML Structure -->
+<div class="project-container">
+  
+  <!-- Project 1 -->
+  <div class="project">
+    <h3>EMG Muscle Activity Detection Circuit</h3>
+    <p class="project-meta">Spring 2026 | MIT 6.2040 Analog Electronics Lab</p>
+    <p>Designed the signal cleaning and acquisition chain of a fully analog EMG detection system — distributing ~108 dB of gain across a difference-amplifier front end, active filtering (Sallen-Key high-pass, Twin-T 60 Hz notch, MFB envelope low-pass), and precision full-wave rectification to turn a µV-level biopotential into a calibrated 0–9 V contraction envelope on a single 9 V supply.</p>
+    
+    <div class="skills">
+        <span class="skill-tag">Analog Signal Chain Design</span>
+        <span class="skill-tag">Active Filters</span>
+        <span class="skill-tag">Precision Rectification</span>
+        <span class="skill-tag">Single-Supply Design</span>
+    </div>
+    
+    <a href="projects/emg.html" class="project-link">View Project Details →</a>
+  </div> <!-- Close Project 1 -->
+    
+    <!-- Project 2 -->
+  <div class="project">
+    <h3>A Bayesian Look at the 3-2-1 Crack Spread</h3>
+    <p class="project-meta">Summer 2026 | Personal Project</p>
+    <p>Modeled US refining margin against inventory and utilization fundamentals using Bayesian regression with a Student-t likelihood over 575 weeks of EIA and futures data. Found an asymmetric inventory response &mdash; product deficits widen margin several times more&times; more than equivalent surpluses compress it &mdash; identified across two structurally unrelated surplus regimes, and quantified where the model's remaining coefficients are not separately identifiable.</p>
+
+    <div class="skills">
+        <span class="skill-tag">Bayesian Inference</span>
+        <span class="skill-tag">PyMC</span>
+        <span class="skill-tag">Commodity Fundamentals</span>
+        <span class="skill-tag">Model Diagnostics</span>
+    </div>
+    <a href="projects/crack-spread.html" class="project-link">View Project Details &rarr;</a>
+  </div> <!-- Close Project 2 -->
+    
+  <!-- Project 3 -->
+  <div class="project">
+    <h3>Adjustable Linear Power Supply</h3>
+    <p class="project-meta">Personal Project | In progress — expected late August 2026</p>
+    <p>Designing a 0–15 V, 2 A adjustable bench supply with current limiting, foldback protection, and thermal shutdown. Currently in the design phase: requirements specification, topology selection, component-level calculations, and LTspice verification.</p>
+
+    <div class="skills">
+        <span class="skill-tag">Power Electronics</span>
+        <span class="skill-tag">Linear Regulation</span>
+        <span class="skill-tag">Thermal Design</span>
+        <span class="skill-tag">LTspice</span>
+    </div>
+  </div> <!-- Close Project 2 -->
+
+</div>
+
+<!-- CSS Styling -->
+<style>
+  /* This targets every project block and creates a gap below it */
+  .project {
+    margin-bottom: 40px; /* Adjust this value to make the gap larger or smaller */
+  }
+
+  /* Keeps the link block-level so the margin applies cleanly above the next heading */
+  .project-link {
+    display: inline-block;
+    margin-bottom: 15px; 
+  }
+</style>
+
+        
+        
+    </section>
+
+    <section>
+        <h2>Skills</h2>
+        <p><strong>Circuit Design & Simulation:</strong> LTSpice, Cadence Virtuoso</p>
+        <p><strong>Programming:</strong> Python, C</p>
+        <p><strong>Lab Equipment:</strong> Oscilloscope, Function Generator, Multimeter, Soldering</p>
+        <p><strong>PCB Design:</strong> KiCad (learning)</p>
+    </section>
+
+    <section>
+        <h2>Education</h2>
+        <p><strong>Massachusetts Institute of Technology</strong> | Class of 2028</p>
+        <p>B.S. Electrical Engineering with Computing (6-5) & B.S. Business Analytics (15-2) | GPA: 4.4/5.0</p>
+        <p style="margin-top: 10px;"><strong>Relevant Coursework:</strong> Analog Electronics Lab, Semiconductor Electronic Circuits, Signal Processing, Probability & Statistics, Optimization Methods for Business Analytics</p>
+        <p style="margin-top: 10px;"><strong>Upcoming Coursework:</strong> Digital Systems Laboratory(FPGAs), Solid-State Circuits, Dynamical System Modeling and Control Design</strong> </p>
+    </section>
+    </section>
+<script data-goatcounter="https://alangarcia.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
