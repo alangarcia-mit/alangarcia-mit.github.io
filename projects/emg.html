@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMG Detection Circuit — Alan Garcia</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        header {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .project-meta { color: #7f8c8d; font-size: 1em; margin-bottom: 15px; }
+        .skills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .skill-tag {
+            background: #ecf0f1;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h3 { color: #34495e; margin: 25px 0 10px 0; }
+        h3:first-of-type { margin-top: 0; }
+        p { margin-bottom: 15px; }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .image-gallery img {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: block;
+        }
+        .image-gallery a { text-decoration: none; }
+        .image-caption {
+            text-align: center;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            margin: 20px 0;
+            border-radius: 8px;
+        }
+        .video-container iframe, .video-container video {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            border-radius: 8px;
+        }
+
+        ul { margin-left: 20px; margin-top: 10px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .download-link:hover { background: #1a252f; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.93em;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e6;
+            vertical-align: top;
+        }
+        th { background: #ecf0f1; font-weight: 600; color: #2c3e50; }
+        td.num { white-space: nowrap; }
+        tr.total td {
+            font-weight: 600;
+            background: #f8f9fa;
+            border-top: 2px solid #3498db;
+        }
+        .spec-table td:first-child { font-weight: 600; width: 32%; }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-link">&larr; Back to Portfolio</a>
+
+    <header>
+        <h1>EMG Muscle Activity Detection Circuit</h1>
+        <p class="project-meta">Spring 2026 &nbsp;|&nbsp; MIT 6.2040 Analog Electronics Laboratory &nbsp;|&nbsp; Team of 2</p>
+        <div class="skills">
+            <span class="skill-tag">Analog Signal Chain Design</span>
+            <span class="skill-tag">Sensor Signal Conditioning</span>
+            <span class="skill-tag">Active Filters</span>
+            <span class="skill-tag">Precision Rectification</span>
+            <span class="skill-tag">Single-Supply Design</span>
+            <span class="skill-tag">LTspice</span>
+        </div>
+    </header>
+
+    <section>
+        <h2>Overview</h2>
+        <p>
+            Surface electromyography (EMG) measures the electrical activity a muscle produces when it contracts. The signal at the skin is roughly <strong>100&nbsp;&micro;V to 2&nbsp;mV peak-to-peak</strong>, and it arrives buried under motion artifacts, electrode drift, and 60&nbsp;Hz mains pickup that are often <em>larger than the signal itself</em>. Extracting anything usable from it is an exercise in gain distribution, band-limiting, and noise rejection.
+        </p>
+        <p>
+            For our 6.2040 final project, my partner and I built a fully analog EMG detection system, i.e. no microcontroller, no DSP. My half was the <strong>signal cleaning and acquisition chain</strong>: everything from the electrodes through to a calibrated 0&ndash;9&nbsp;V DC envelope proportional to contraction strength, plus the LED bar-graph display used to visualize it. My partner built the downstream decision logic that consumes the cleaned envelope.
+        </p>
+        <p>
+            The chain runs from a <strong>single 9&nbsp;V supply</strong>. That was a safety decision as much as a practical one: the intent was for the system to be battery-powered if ever applied to a person, limiting plausible fault current into the body. The cost is that there is no negative rail, so every node that would naturally sit at ground instead sits at a <strong>4.5&nbsp;V virtual ground</strong>, generated by a buffered resistor divider and used as the reference for every stage.
+        </p>
+
+        <h3>Specifications</h3>
+        <table class="spec-table">
+            <tbody>
+                <tr>
+                    <td>Input signal</td>
+                    <td>~100&nbsp;&micro;V &ndash; 2&nbsp;mV pk-pk differential, at the electrodes</td>
+                </tr>
+                <tr>
+                    <td>Output</td>
+                    <td>0&nbsp;V (rest) to ~9&nbsp;V (maximum voluntary contraction), DC envelope</td>
+                </tr>
+                <tr>
+                    <td>Total gain</td>
+                    <td>~240,000&times; (~108&nbsp;dB) &mdash; 1,600&times; before rectification, 150&times; after</td>
+                </tr>
+                <tr>
+                    <td>High-pass corner</td>
+                    <td>&minus;3&nbsp;dB at ~7&nbsp;Hz (2nd-order Sallen-Key, Q &asymp; 0.5)</td>
+                </tr>
+                <tr>
+                    <td>Mains notch</td>
+                    <td>~59&nbsp;Hz, Q &asymp; 5, &gt;30&nbsp;dB measured rejection</td>
+                </tr>
+                <tr>
+                    <td>Envelope bandwidth</td>
+                    <td>&minus;3&nbsp;dB at ~2&nbsp;Hz (~80&nbsp;ms smoothing time constant)</td>
+                </tr>
+                <tr>
+                    <td>Input impedance</td>
+                    <td>~10&nbsp;k&Omega;, set by the difference amplifier's input resistors</td>
+                </tr>
+                <tr>
+                    <td>Power supply</td>
+                    <td>Single 9&nbsp;V rail, 4.5&nbsp;V buffered virtual ground; LM6132 rail-to-rail op-amps throughout</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!--
+      VIDEO SECTION
+      Replace VIDEO_ID with your YouTube video ID (the part after "v=" in the URL).
+      Upload as UNLISTED, not private.
+      If you do not have a video ready, DELETE this entire <section> — a broken embed is worse than no video.
+    -->
+    <section>
+        <h2>Demonstration</h2>
+        <div class="video-container">
+            <iframe src="https://www.youtube.com/embed/9BObqr0zUwE"
+                    title="EMG Circuit Demonstration"
+                    frameborder="0"
+                    allowfullscreen></iframe>
+        </div>
+        <p>Two signal electrodes are placed roughly three inches apart along the flexor carpi radialis on the forearm, with a reference electrode on the bony prominence of the elbow. As grip force increases, the output envelope rises and the LED bar lights in sequence.</p>
+    </section>
+
+    <section>
+        <h2>Signal Chain</h2>
+        <p>Nine stages, in order. Gain is distributed deliberately rather than concentrated.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Stage</th>
+                    <th>Topology</th>
+                    <th class="num">Gain</th>
+                    <th>Key parameters</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td><td>Differential front end</td>
+                    <td>One-op-amp difference amplifier</td>
+                    <td class="num">100&times;</td>
+                    <td>10&nbsp;k&Omega; / 1&nbsp;M&Omega; matched pairs; three-electrode (two signal, one body reference)</td>
+                </tr>
+                <tr>
+                    <td>2</td><td>High-pass filter</td>
+                    <td>2nd-order Sallen-Key, unity gain</td>
+                    <td class="num">1&times;</td>
+                    <td>&minus;3&nbsp;dB at ~7&nbsp;Hz, Q &asymp; 0.5 (no peaking)</td>
+                </tr>
+                <tr>
+                    <td>3</td><td>Post-amplifier</td>
+                    <td>Non-inverting</td>
+                    <td class="num">16&times;</td>
+                    <td>10&nbsp;k&Omega; / 150&nbsp;k&Omega;; preserves polarity through the chain</td>
+                </tr>
+                <tr>
+                    <td>4</td><td>Mains notch</td>
+                    <td>Active Twin-T with positive feedback</td>
+                    <td class="num">1&times;</td>
+                    <td>~59&nbsp;Hz, Q &asymp; 5, &gt;30&nbsp;dB measured rejection</td>
+                </tr>
+                <tr>
+                    <td>5</td><td>Rectifier</td>
+                    <td>Two-op-amp precision full-wave (absolute value)</td>
+                    <td class="num">1&times;</td>
+                    <td>Diodes inside the feedback loop &mdash; effective threshold on the order of microvolts, not the 0.6&nbsp;V diode drop</td>
+                </tr>
+                <tr>
+                    <td>6</td><td>Envelope low-pass</td>
+                    <td>2nd-order multiple-feedback</td>
+                    <td class="num">&minus;1&times;</td>
+                    <td>&minus;3&nbsp;dB at ~2&nbsp;Hz &rarr; ~80&nbsp;ms smoothing time constant</td>
+                </tr>
+                <tr>
+                    <td>7</td><td>Envelope amplifier</td>
+                    <td>Inverting</td>
+                    <td class="num">&minus;50&times;</td>
+                    <td>10&nbsp;k&Omega; / 500&nbsp;k&Omega;; restores polarity, supplies the bulk of post-rectifier gain</td>
+                </tr>
+                <tr>
+                    <td>8</td><td>Output stage</td>
+                    <td>Difference amplifier + offset potentiometer</td>
+                    <td class="num">3&times;</td>
+                    <td>Subtracts the resting DC level so rest = 0&nbsp;V; scales full contraction to the 9&nbsp;V rail</td>
+                </tr>
+                <tr>
+                    <td>9</td><td>Display</td>
+                    <td>Five LM393 comparators, resistor-ladder thresholds</td>
+                    <td class="num">&mdash;</td>
+                    <td>1.5&nbsp;V steps; open-collector outputs driving five LEDs</td>
+                </tr>
+                <tr class="total">
+                    <td colspan="3">End-to-end small-signal gain</td>
+                    <td class="num">~240,000&times;</td>
+                    <td>~108&nbsp;dB &mdash; 1,600&times; before rectification, 150&times; after</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Design Decisions</h2>
+
+        <h3>A difference amplifier instead of an instrumentation amplifier</h3>
+        <p>
+            The textbook front end for a biopotential measurement is a three-op-amp instrumentation amplifier (buffered high-impedance inputs, far better CMRR). I used a one-op-amp difference amplifier instead. The reasoning was that a dedicated 60&nbsp;Hz notch would be necessary downstream regardless of how good the front-end CMRR was, so spending parts to push CMRR further would not change what the chain could actually do. That reasoning holds for mains rejection specifically, but it turned out to have a real cost on input impedance and on how much work the notch had to do. I discuss that under <a href="#limitations">Limitations</a>.
+        </p>
+
+        <h3>Where the gain goes</h3>
+        <p>
+            The chain applies 1,600&times; before the rectifier and 150&times; after it, and that split is not arbitrary. Adding more gain <em>upstream</em> of the notch would amplify residual mains content past the point the notch could recover it (the notch has finite depth, so whatever 60&nbsp;Hz survives the front end gets multiplied by everything downstream). Adding gain <em>after</em> rectification and envelope filtering is nearly free by comparison: at that point the signal is quasi-DC, high-frequency interference has already been smoothed away, and the full output swing can be spent on the envelope itself. So the bulk gain (&minus;50&times;) sits at stage 7, not stage 1.
+        </p>
+
+        <h3>Full-wave rather than half-wave rectification</h3>
+        <p>
+            Full-wave rectification doubles the fundamental frequency at the output, which relaxes the requirement on the envelope low-pass that follows. And a half-wave rectifier throws away half the signal energy, which would have to be made up with gain elsewhere. A passive diode rectifier was never viable here (the signal at that node is tens to hundreds of millivolts, well under the 0.6&nbsp;V forward drop of a 1N914, so a passive rectifier would simply have clipped everything of interest). Putting the diodes inside the op-amp's feedback loop divides the effective threshold by the open-loop gain, bringing it down to the microvolt scale.
+        </p>
+
+        <h3>Sallen-Key for the high-pass, multiple-feedback for the low-pass</h3>
+        <p>
+            The high-pass is unity-gain Sallen-Key at Q &asymp; 0.5, deliberately chosen for a flat, Bessel-like response with no peaking at the corner. A higher-Q response would have peaked right where motion artifacts live, amplifying exactly the content the filter exists to suppress. It is also non-inverting, which preserved polarity through the early stages and made scope debugging considerably easier.
+        </p>
+        <p>
+            The envelope low-pass uses multiple-feedback instead. At 82&nbsp;k&Omega; and 1&nbsp;&micro;F the impedances are high enough that op-amp input bias current starts to matter, and MFB is less sensitive to it than Sallen-Key in that regime. The ~2&nbsp;Hz corner was chosen against the human timescale: ~80&nbsp;ms is fast enough that the output tracks changes in effort within about a tenth of a second, but slow enough to suppress the 30&ndash;450&nbsp;Hz EMG carrier and the rectifier's harmonics. Faster, and carrier ripple leaks into the output; slower, and the display feels sluggish.
+        </p>
+
+        <h3>Boosting the notch Q with positive feedback</h3>
+        <p>
+            A passive Twin-T has a Q around 0.25 and as a result, the notch is so wide that it takes the EMG band down along with the mains interference. Wrapping the network in a positive feedback loop with a 10&nbsp;k&Omega; / 180&nbsp;k&Omega; divider gives a feedback factor of 0.947, which raises Q to roughly 5. That narrows the notch enough to remove 60&nbsp;Hz while leaving the surrounding EMG content intact.
+        </p>
+    </section>
+
+    <section>
+        <h2>Measured Performance</h2>
+        <p>Each filter stage was characterized individually on the bench by injecting a sine referenced to the virtual ground at the stage input and sweeping frequency while measuring output amplitude on the oscilloscope.</p>
+        <ul>
+            <li><strong>High-pass (Sallen-Key):</strong> &minus;3&nbsp;dB corner near 7&nbsp;Hz, second-order roll-off below it</li>
+            <li><strong>Notch (active Twin-T):</strong> centered near 59&nbsp;Hz, greater than 30&nbsp;dB attenuation at the notch bottom, Q &asymp; 5</li>
+            <li><strong>Low-pass (multiple-feedback):</strong> &minus;3&nbsp;dB corner near 2&nbsp;Hz, second-order roll-off above it</li>
+        </ul>
+
+        <p>System response, measured on a human subject with a 9&nbsp;V bench supply and the offset potentiometer trimmed so that rest reads 0&nbsp;V:</p>
+        <table>
+            <thead>
+                <tr><th>Condition</th><th>Output</th><th>LEDs lit</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Forearm relaxed, fingers extended</td>
+                    <td>~0&nbsp;V</td>
+                    <td>0 of 5</td>
+                </tr>
+                <tr>
+                    <td>Light contraction (fingers gently curled)</td>
+                    <td>~mid-scale, settling within 100&ndash;150&nbsp;ms</td>
+                    <td>2&ndash;3 of 5</td>
+                </tr>
+                <tr>
+                    <td>Maximum voluntary contraction (clenched fist)</td>
+                    <td>~9&nbsp;V (upper rail)</td>
+                    <td>5 of 5</td>
+                </tr>
+                <tr>
+                    <td>Slowly modulated grip force</td>
+                    <td>Smooth tracking, no flicker at threshold crossings</td>
+                    <td>Proportional</td>
+                </tr>
+            </tbody>
+        </table>
+        <p style="margin-top: 15px;">The chain remained stable across test sessions of tens of minutes with no re-calibration required mid-session.</p>
+    </section>
+
+    <section>
+        <h2>Photos, Schematics &amp; Measurements</h2>
+        <p>Click any image to open it full size.</p>
+        <div class="image-gallery">
+            <div>
+                <a href="../images/emg-protoboard.png" target="_blank">
+                    <img src="../images/emg-protoboard.png" alt="Annotated photograph of the signal cleaning chain built on protoboard, with each stage labeled">
+                </a>
+                <p class="image-caption">The chain on protoboard, with each stage labeled</p>
+            </div>
+            <div>
+                <a href="../images/emg-schematic.png" target="_blank">
+                    <img src="../images/emg-schematic.png" alt="Full LTspice schematic of the signal cleaning chain">
+                </a>
+                <p class="image-caption">Full LTspice schematic of the signal chain</p>
+            </div>
+            <div>
+                <a href="../images/emg-bode-notch.png" target="_blank">
+                    <img src="../images/emg-bode-notch.png" alt="Measured Bode plot of the active Twin-T notch filter">
+                </a>
+                <p class="image-caption">Measured response of the active Twin-T notch &mdash; ~59&nbsp;Hz, &gt;30&nbsp;dB</p>
+            </div>
+            <div>
+                <a href="../images/emg-bode-hpf.png" target="_blank">
+                    <img src="../images/emg-bode-hpf.png" alt="Measured Bode plot of the Sallen-Key high-pass filter">
+                </a>
+                <p class="image-caption">Measured response of the Sallen-Key high-pass &mdash; ~7&nbsp;Hz corner</p>
+            </div>
+            <div>
+                <a href="../images/emg-bode-lpf.png" target="_blank">
+                    <img src="../images/emg-bode-lpf.png" alt="Measured Bode plot of the multiple-feedback low-pass filter">
+                </a>
+                <p class="image-caption">Measured response of the MFB envelope low-pass &mdash; ~2&nbsp;Hz corner</p>
+            </div>
+            <div>
+                <a href="../images/emg-in-action.png" target="_blank">
+                    <img src="../images/emg-in-action.png" alt="Circuit operating: LED bar responding to contraction alongside oscilloscope output">
+                </a>
+                <p class="image-caption">Circuit in operation &mdash; LED bar and scope output across contraction states</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Debugging &amp; Iteration</h2>
+
+        <h3>60 Hz dominated everything until the notch worked</h3>
+        <p>
+            Before the active Twin-T was functioning, mains pickup was very visible on the scope at every probe point past the second gain stage (unsurprising in hindsight, since 1,600&times; of gain sits ahead of the notch and amplifies whatever common-mode interference the front end fails to reject). Twisted-pair electrode leads and routing them away from the bench power strip helped at the margin. The notch itself was the actual fix.
+        </p>
+
+        <h3>On a single supply, "ground" is a design decision, not a default</h3>
+        <p>
+            Several stages that simulated correctly behaved erratically on the bench because a node that should have referenced the 4.5&nbsp;V virtual ground had been wired to actual ground instead. The symptom was consistent and unhelpful: the output stuck at 0&nbsp;V or saturated at 9&nbsp;V regardless of input. The fix was almost always the same: trace every node back to its reference and confirm that AC paths terminate at V_GND, not at GND.
+        </p>
+
+        <h3>Twin-T notches are unforgiving of component mismatch</h3>
+        <p>
+            The first build notched at roughly 55&nbsp;Hz with noticeably shallow and bad attenuation (The first iteration also used a passive notch filter which didn't help). Both the center frequency and the depth of a Twin-T depend on tight matching between the R and C pairs, and standard-tolerance parts were not good enough. Without access to precision components, I measured individual parts and hand-selected the closest-matching set, which pulled the center back to ~59&nbsp;Hz and deepened the notch past 30&nbsp;dB. 
+        </p>
+    </section>
+
+    <section id="limitations">
+        <h2>Limitations &amp; Future Improvements</h2>
+        <p>The chain works, but several parts of it are clearly first-pass solutions. Listed roughly in order of how much benefit I think each would deliver.</p>
+
+        <h3>1. A monolithic instrumentation amplifier at the front end</h3>
+        <p>
+            The single biggest improvement would be replacing the discrete one-op-amp difference amplifier with an integrated instrumentation amplifier &mdash; an AD620, INA128, or INA333. The discrete topology tops out around 80&nbsp;dB CMRR, and only if the 10&nbsp;k&Omega; and 1&nbsp;M&Omega; pairs are matched to better than 0.1%. The build used 5% resistors, so the real front-end CMRR was almost certainly well short of that, and the resulting 60&nbsp;Hz common-mode-to-differential conversion was a meaningful contributor to the mains pickup the notch then had to clean up.
+        </p>
+        <p>
+            An AD620 specifies 100&nbsp;dB CMRR at 60&nbsp;Hz with a single external gain-setting resistor, and its input impedance is on the order of 10&nbsp;G&Omega; rather than the ~10&nbsp;k&Omega; my discrete stage presents, which matters, because skin-electrode contact impedance ranges from tens of k&Omega; to around 1&nbsp;M&Omega;. The higher input impedance would also let me drop or greatly reduce the 10&nbsp;k&Omega; input resistors, lowering their Johnson noise contribution at the most sensitive point in the chain. The trade-offs are cost, and the loss of pedagogical clarity: a monolithic INA is a black box, whereas the discrete topology makes the CMRR-matching network visible and adjustable.
+        </p>
+
+        <h3>2. Shielded electrode cables</h3>
+        <p>
+            The leads in the current build are unshielded alligator-clip jumper wires. Capacitive coupling from nearby mains-powered equipment into these leads was, in my estimation, the largest single contributor to 60&nbsp;Hz pickup. Shielded cable with the shield driven at the common-mode potential (a guarded or driven-shield configuration) would substantially reduce that coupling, and it is close to free in parts cost.
+        </p>
+
+        <h3>3. A PCB instead of protoboard</h3>
+        <p>
+            The current build is entirely on protoboard, and the long, uncontrolled wiring picks up measurable noise. A proper PCB with continuous GND and V_GND planes would lower the noise floor and make the design reproducible rather than a one-off.
+        </p>
+
+        <h3>4. Tighter component tolerances</h3>
+        <p>
+            Every matched-network block in the chain, the difference amplifier, the Twin-T, the rectifier's five 10&nbsp;k&Omega; resistors, is limited by how well its components match, not by its topology. Moving to 1% resistors and 5% C0G ceramic capacitors would close most of the gap between the theoretical and measured performance without changing a single design decision.
+        </p>
+
+    </section>
+    <!--
+    <section>
+        <h2>Full Project Report</h2>
+        <p>The complete report covers both halves of the system: my signal cleaning and acquisition chain, and my partner's downstream decision logic. It includes full schematics, component values and derivations, simulation results, and the measured Bode plots for every filter stage.</p>
+        <a href="../documents/emg-report.pdf" class="download-link" target="_blank">Download Full Report (PDF)</a>
+    </section>
+    -->
+    <a href="../index.html" class="back-link">&larr; Back to Portfolio</a>
+    <script data-goatcounter="https://alangarcia.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>

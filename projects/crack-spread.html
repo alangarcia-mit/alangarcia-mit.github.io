@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bayesian Crack Spread Model | Alan Gael Garcia</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back-link:hover { text-decoration: underline; }
+
+        header {
+            background: white;
+            padding: 40px;
+            margin-bottom: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 { color: #2c3e50; margin-bottom: 10px; }
+        .project-meta { color: #7f8c8d; font-size: 1em; margin-bottom: 15px; }
+        .skills { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 15px; }
+        .skill-tag {
+            background: #ecf0f1;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+        }
+
+        section {
+            background: white;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h3 { color: #34495e; margin: 25px 0 10px 0; }
+        h3:first-of-type { margin-top: 0; }
+        p { margin-bottom: 15px; }
+
+        .image-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .image-gallery img {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: block;
+        }
+        .image-gallery a { text-decoration: none; }
+        .image-caption {
+            text-align: center;
+            font-size: 0.9em;
+            color: #7f8c8d;
+            margin-top: 8px;
+        }
+
+        .figure-wide { margin-top: 20px; }
+        .figure-wide img {
+            width: 100%;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            display: block;
+        }
+
+        ul { margin-left: 20px; margin-top: 10px; margin-bottom: 15px; }
+        li { margin-bottom: 8px; }
+
+        .download-link {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 20px;
+            background: #2c3e50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .download-link:hover { background: #1a252f; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.93em;
+        }
+        th, td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e1e4e6;
+            vertical-align: top;
+        }
+        th { background: #ecf0f1; font-weight: 600; color: #2c3e50; }
+        td.num { white-space: nowrap; }
+        tr.total td {
+            font-weight: 600;
+            background: #f8f9fa;
+            border-top: 2px solid #3498db;
+        }
+        .spec-table td:first-child { font-weight: 600; width: 32%; }
+
+        .callout {
+            background: #f8f9fa;
+            border-left: 3px solid #3498db;
+            padding: 15px 20px;
+            margin: 20px 0;
+            font-size: 0.95em;
+        }
+        .callout p:last-child { margin-bottom: 0; }
+        code {
+            background: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .formula {
+            background: #f8f9fa;
+            padding: 15px 20px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'SF Mono', Menlo, Consolas, monospace;
+            font-size: 0.92em;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <a href="../index.html" class="back-link">&larr; Back to Portfolio</a>
+
+    <header>
+        <h1>A Bayesian Look at the 3-2-1 Crack Spread</h1>
+        <p class="project-meta">Summer 2026 &nbsp;|&nbsp; Personal Project &nbsp;|&nbsp; Python, PyMC</p>
+        <div class="skills">
+            <span class="skill-tag">Bayesian Inference</span>
+            <span class="skill-tag">PyMC / NumPyro</span>
+            <span class="skill-tag">Commodity Fundamentals</span>
+            <span class="skill-tag">Time-Series Data</span>
+            <span class="skill-tag">Model Diagnostics</span>
+            <span class="skill-tag">Python</span>
+        </div>
+    </header>
+
+    <section>
+        <h2>Overview</h2>
+        <div class="callout">
+            <p><strong>What this is:</strong> an exercise in reasoning about what moves refiner margin, with honest uncertainty about how much the data actually supports. It isn't a forecast, it isn't a trading signal, and I'm not claiming any predictive edge.</p>
+        </div>
+        <p>
+            I modeled the weekly 3-2-1 crack spread, which is the standard proxy for US refining margin, against inventory and utilization fundamentals. Bayesian linear regression with a Student-t likelihood, fit on 575 weeks of data running from 2015 to the end of 2025.
+        </p>
+        <p>
+            The main result is an <strong>asymmetry in how margin responds to product inventories</strong>. Push gasoline stocks one standard deviation deeper into deficit and the crack widens by about <strong>$2.94/bbl</strong> (94% HDI: 2.44 to 3.44). Push them the same distance into surplus and it compresses by roughly <strong>$0.44/bbl</strong> (&minus;0.88 to 0.01), an interval that only barely clears zero. Tightness moves margin hard. Glut barely moves it at all.
+        </p>
+        <p>
+            That asymmetry held up under a robustness check that shifted several other coefficients by 40% or more, and the plateau is visible in two structurally unrelated surplus episodes: the 2015 to 2019 shale glut and the 2020 to 2021 demand collapse. The fact that both eras agree is what convinced me it's a real relationship rather than an artifact of one period.
+        </p>
+        <p>
+            The second finding is a limitation rather than a result. The post-2022 regime term and the dollar index turn out <strong>not to be separately identified</strong> in this sample, with posteriors correlating at &minus;0.74. I report both specifications side by side instead of picking the one I like.
+        </p>
+        <p>
+            The full script that produces everything on this page is available at the bottom.
+        </p>
+    </section>
+
+    <section>
+        <h2>The Instrument</h2>
+        <p>
+            The 3-2-1 crack approximates refining economics: three barrels of crude in, two of gasoline and one of distillate out. The spread is the gross margin.
+        </p>
+        <div class="formula">
+            crack = [ 42 &times; (2 &times; RBOB + 1 &times; ULSD) &minus; 3 &times; WTI ] / 3
+        </div>
+        <p>
+            The 42 converts the products, which are quoted in dollars per gallon, onto the per-barrel basis crude is quoted in. Dividing by three expresses margin per barrel of crude run.
+        </p>
+        <p>
+            I picked the crack over flat crude price on purpose. Weekly flat price is close to a random walk, so a model that "predicts" it from its own lags mostly just learns to output <em>tomorrow &asymp; today</em>, and reports a flattering error while doing it. Margin is a different kind of object. It's a relationship between physical quantities with fundamentals you can actually reason about, and it's what a refiner or a products desk is genuinely exposed to.
+        </p>
+        <div class="figure-wide">
+            <a href="../images/crack-history.png" target="_blank">
+                <img src="../images/crack-history.png" alt="Weekly 3-2-1 crack spread from 2015 to 2025, showing the 2020 collapse and the 2022 record margins">
+            </a>
+            <p class="image-caption">Weekly 3-2-1 crack spread, 2015 to 2025. Both the 2020 collapse and the 2022 blowout are clearly visible.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Data &amp; Construction</h2>
+        <table>
+            <thead>
+                <tr><th>Source</th><th>Series</th><th>Frequency</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Yahoo Finance</td><td>WTI, RBOB, ULSD front-month futures</td><td>daily to weekly</td></tr>
+                <tr><td>EIA Weekly Petroleum Status</td><td>crude, gasoline, distillate stocks; refinery utilization</td><td>weekly</td></tr>
+                <tr><td>FRED</td><td>broad trade-weighted dollar index</td><td>daily to weekly</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top: 15px;">
+            Everything is aligned to EIA's Friday-ending reporting week. I take the last observation in each week rather than an average, so the prices are values that actually traded.
+        </p>
+
+        <h3>Inventories enter as seasonal deviations, not levels</h3>
+        <p>
+            Raw inventory levels both trend and cycle, so a coefficient on the level ends up picking up the calendar and the decade more than it picks up scarcity. What traders actually watch is the deviation from the seasonal norm, which is the number behind every "stocks are 4% below the five-year average" headline.
+        </p>
+        <p>
+            So I compute a <strong>trailing</strong> five-year average for each week of the year. The benchmark for week 30 of 2022 is the mean of week 30 across 2017 to 2021. This de-trends the predictor, matches how the industry actually defines the number, and uses only information available beforehand. The cost is the first five years of the sample, which get eaten by the burn-in window.
+        </p>
+
+        <h3>Three honest caveats about the data</h3>
+        <ul>
+            <li><strong>Look-ahead.</strong> EIA's Friday-week figures aren't published until the following Wednesday, so a same-week join uses information the market didn't have in real time. That's acceptable for an explanatory model and would invalidate any predictive claim. I'm not making one.</li>
+            <li><strong>Contract rolls.</strong> Continuous front-month series stitch contracts together without back-adjustment. WTI and the products roll on different schedules, so the small discontinuities don't fully cancel in the spread.</li>
+            <li><strong>Revisions.</strong> EIA revises its weekly figures. What I downloaded isn't exactly what the market saw at the time.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>What I Expected Before Fitting</h2>
+        <p>
+            I wrote these down before running any model, so the posterior works as a check rather than an echo. The priors in the model are weakly informative and centred at <strong>zero</strong>, not at these signs. If I'd centred them here and then reported that the posterior agreed, I wouldn't have learned anything.
+        </p>
+        <table>
+            <thead>
+                <tr><th>Predictor</th><th>Expected sign</th><th>Reasoning</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Gasoline deficit</td><td class="num">+ strong</td><td>Scarcity has to be rationed through margin</td></tr>
+                <tr><td>Gasoline surplus</td><td class="num">&minus; weak</td><td>The marginal barrel just sits in a tank</td></tr>
+                <tr><td>Distillate deficit</td><td class="num">+ strong</td><td>Same mechanism, tighter storage</td></tr>
+                <tr><td>Distillate surplus</td><td class="num">&minus; weak</td><td>Same mechanism</td></tr>
+                <tr><td>Refinery utilization</td><td class="num">+</td><td>But endogenous, see limitations</td></tr>
+                <tr><td>Dollar index</td><td class="num">&asymp; 0</td><td>Both legs are dollar-denominated, so FX should largely cancel in a spread</td></tr>
+                <tr><td>Summer seasonal</td><td class="num">+</td><td>Driving-season gasoline demand</td></tr>
+                <tr><td>Post-2022 regime</td><td class="num">+</td><td>Permanent refining capacity closed during 2020 and 2021</td></tr>
+            </tbody>
+        </table>
+    </section>
+
+    <section>
+        <h2>Method</h2>
+
+        <h3>Why Bayesian</h3>
+        <p>
+            The output that matters here is a distribution, not a point estimate. A posterior tells me how confident the data lets me be about each relationship, and a coefficient whose credible interval straddles zero gets reported as exactly that: something the data doesn't resolve. That's much closer to how the underlying question is actually posed than a single number with a standard error attached.
+        </p>
+
+        <h3>Why Student-t</h3>
+        <p>
+            The target has a heavy right tail. Median sits near $20/bbl, but the maximum runs above $62 during the 2022 distillate dislocation. Under a Normal likelihood those points drag the fit around and inflate the residual variance everywhere else. The posterior for the degrees-of-freedom parameter came back at <strong>&nu; &asymp; 3.6</strong> (2.41 to 4.81), nowhere near the ~30 where Student-t starts approximating Normal. That's the data confirming the choice rather than me asserting it.
+        </p>
+
+        <h3>Why hinges instead of a quadratic</h3>
+        <p>
+            The scatter of crack against product deviation is visibly kinked right at the seasonal norm: steep on the deficit side, flat on the surplus side. A quadratic would eventually bend back on itself, which implies something economically false at the extremes and produces a coefficient nobody can interpret out loud. Instead I split each deviation into two non-negative columns, deficit magnitude and surplus magnitude, and let each get its own coefficient. The model stays linear in parameters, and I can still state what every number means in a sentence.
+        </p>
+        <p>
+            Continuous predictors are standardized, so the coefficients read as dollars per barrel per standard-deviation move. The regime indicator stays 0/1 so its coefficient reads directly in dollars.
+        </p>
+        <div class="figure-wide">
+            <a href="../images/crack-scatters-by-era.png" target="_blank">
+                <img src="../images/crack-scatters-by-era.png" alt="Crack spread against gasoline deviation, distillate deviation, and refinery utilization, colour-coded by era">
+            </a>
+            <p class="image-caption">Crack against each driver, colour-coded by era. This is the diagnostic that drove the hinge specification.</p>
+        </div>
+    </section>
+
+    <section>
+        <h2>Results</h2>
+        <p>
+            Full specification, 575 weekly observations, January 2015 through December 2025 Four chains, r-hat of 1.00 on every parameter, ESS in the thousands, zero divergences.
+        </p>
+        <table>
+            <thead>
+                <tr><th>Predictor</th><th>Mean</th><th>94% HDI</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Intercept</td><td class="num">18.34</td><td class="num">17.85 to 18.80</td></tr>
+                <tr><td><strong>Gasoline deficit</strong></td><td class="num"><strong>+2.94</strong></td><td class="num">2.44 to 3.44</td></tr>
+                <tr><td><strong>Gasoline surplus</strong></td><td class="num"><strong>&minus;0.44</strong></td><td class="num">&minus;0.88 to 0.01</td></tr>
+                <tr><td>Distillate deficit</td><td class="num">+1.66</td><td class="num">1.15 to 2.22</td></tr>
+                <tr><td>Distillate surplus</td><td class="num">&minus;0.35</td><td class="num">&minus;0.80 to 0.07</td></tr>
+                <tr><td>Refinery utilization</td><td class="num">+1.01</td><td class="num">0.66 to 1.33</td></tr>
+                <tr><td>Dollar index</td><td class="num">&minus;2.44</td><td class="num">&minus;2.96 to &minus;1.81</td></tr>
+                <tr><td>Post-2022 regime</td><td class="num">+8.43</td><td class="num">7.27 to 9.62</td></tr>
+                <tr><td>sin (annual)</td><td class="num">+1.36</td><td class="num">0.96 to 1.79</td></tr>
+                <tr><td>cos (annual)</td><td class="num">&minus;1.82</td><td class="num">&minus;2.21 to &minus;1.42</td></tr>
+                <tr class="total"><td>&sigma; / &nu;</td><td class="num">2.99 / 3.55</td><td class="num">see limitations</td></tr>
+            </tbody>
+        </table>
+
+        <h3>The asymmetry</h3>
+        <p>
+            The deficit response is several times larger than the surplus response. I avoid quoting a precise ratio because the surplus interval runs to +0.01, so the denominator nearly touches zero and the ratio is far less certain than the two point estimates suggest. The more honest statement is that the surplus effect is small enough that the data cannot rule out zero, and for distillate the surplus interval spans zero outright. This is the convex inventory response that storage economics predicts. Below the norm there's no buffer left, so scarcity has to get rationed through price. Above it, the extra barrel goes into a tank and changes almost nothing.
+        </p>
+
+        <h3>Seasonality finds driving season on its own</h3>
+        <p>
+            The sine and cosine pair implies an annual amplitude of roughly <strong>$2.27/bbl</strong>, about $4.5 peak to trough, peaking near <strong>week 21, which is late May</strong>. I never told the model when gasoline demand peaks. It located Memorial Day from the data by itself, which was the single most satisfying moment in the project.
+        </p>
+
+        <h3>A post-2022 level shift exists</h3>
+        <p>
+            How big it is turns out to be an open question, for reasons covered below, but the sign and the presence of the shift are stable across every specification I ran. The mechanism I'd point to is the permanent refining capacity that closed during 2020 and 2021, combined with the redirection of product trade flows after 2022. Less capacity chasing the same demand means fatter margins at any given inventory level.
+        </p>
+
+        <div class="image-gallery">
+            <div>
+                <a href="../images/crack-coefficients.png" target="_blank">
+                    <img src="../images/crack-coefficients.png" alt="Forest plot of coefficient posteriors with 90 percent credible intervals">
+                </a>
+                <p class="image-caption">Coefficient posteriors with 90% credible intervals</p>
+            </div>
+            <div>
+                <a href="../images/crack-fit-vs-actual.png" target="_blank">
+                    <img src="../images/crack-fit-vs-actual.png" alt="Posterior mean and 90 percent predictive band against the actual crack spread over time">
+                </a>
+                <p class="image-caption">Posterior mean and 90% predictive band against actual</p>
+            </div>
+        </div>
+    </section>
+
+    <section>
+        <h2>Robustness</h2>
+        <p>
+            The regime dummy correlates 0.61 with the dollar index in the design matrix, which is high enough to worry about, so I refit the whole thing without the dollar.
+        </p>
+        <table>
+            <thead>
+                <tr><th>Predictor</th><th>Full</th><th>No dollar</th><th>Change</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Gasoline deficit</td><td class="num">2.94</td><td class="num">3.23</td><td class="num">+10%</td></tr>
+                <tr><td>Gasoline surplus</td><td class="num">&minus;0.44</td><td class="num">&minus;0.67</td><td class="num">small</td></tr>
+                <tr><td>Distillate deficit</td><td class="num">1.66</td><td class="num">1.00</td><td class="num"><strong>&minus;40%</strong></td></tr>
+                <tr><td>Distillate surplus</td><td class="num">&minus;0.35</td><td class="num">&minus;0.54</td><td class="num">small</td></tr>
+                <tr><td>Refinery utilization</td><td class="num">1.01</td><td class="num">1.60</td><td class="num"><strong>+58%</strong></td></tr>
+                <tr><td>Post-2022 regime</td><td class="num">8.43</td><td class="num">4.60</td><td class="num"><strong>&minus;45%</strong></td></tr>
+                <tr><td>sin / cos</td><td class="num">1.36 / &minus;1.82</td><td class="num">1.49 / &minus;1.84</td><td class="num">~0%</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top: 15px;">
+            Dropping one predictor moved two others by 40% and 58%. So the collinearity isn't confined to the dollar and regime pair. Several predictors sit on a ridge where the sampler can trade magnitude back and forth between them without changing the fit much.
+        </p>
+        <p>
+            You can see the ridge directly in the joint posterior of the two terms, which correlate at <strong>&minus;0.74</strong>. The data constrains the <em>sum</em> of the regime and dollar effects perfectly well. It just can't tell me how to split it.
+        </p>
+        <div class="figure-wide">
+            <a href="../images/crack-ridge.png" target="_blank">
+                <img src="../images/crack-ridge.png" alt="Joint posterior of the post-2022 and dollar index coefficients showing a negative diagonal ridge">
+            </a>
+            <p class="image-caption">Joint posterior of the regime and dollar coefficients, &rho; = &minus;0.74</p>
+        </div>
+
+        <h3>The sample window is load-bearing</h3>
+        <p>
+            A third fit, restricted to 2020 through end of 2025 (315 weeks), drops the shale-era surplus data. Along with it goes any ability to estimate the asymmetry at all.
+        </p>
+        <table>
+            <thead>
+                <tr><th>Predictor</th><th>Full (2015 to end of 2025)</th><th>Short (2020 to end of 2025)</th></tr>
+            </thead>
+            <tbody>
+                <tr><td>Gasoline surplus</td><td class="num">&minus;0.44 (&minus;0.88 to 0.01)</td><td class="num"><strong>+0.47 (&minus;0.24 to 1.11)</strong></td></tr>
+                <tr><td>Distillate surplus</td><td class="num">&minus;0.35 (&minus;0.80 to 0.07)</td><td class="num">&minus;0.06 (&minus;0.79 to 0.68)</td></tr>
+                <tr><td>Gasoline deficit</td><td class="num">+2.94</td><td class="num">+3.57</td></tr>
+                <tr><td>Post-2022 regime</td><td class="num">+8.43</td><td class="num">+11.54</td></tr>
+                <tr><td>&rho;(regime, dollar)</td><td class="num">&minus;0.74</td><td class="num">&minus;0.81</td></tr>
+            </tbody>
+        </table>
+        <p style="margin-top: 15px;">
+            On the short window the gasoline surplus coefficient flips sign and its interval spans zero. That's the confounding problem in its original form: when every surplus observation is also a COVID observation, "surplus flattens the response" and "2020 and 2021 were different" are the same hypothesis, and no amount of sampling separates them. The deficit side has variation throughout, so it stays stable.
+        </p>
+
+        <h3>What survives, and what doesn't</h3>
+        <ul>
+            <li><strong>Survives:</strong> the gasoline deficit and surplus asymmetry, as long as the sample spans more than one surplus regime; annual seasonality in both amplitude and phase; the existence and sign of a post-2022 level shift; heavy tails.</li>
+            <li><strong>Doesn't:</strong> the magnitude of the post-2022 shift, which lands somewhere between $4.60 and $8.43; the distillate deficit coefficient; refinery utilization, which is unstable and endogenous both; and the dollar coefficient, which I don't interpret at all.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h2>What I Got Wrong</h2>
+
+        <h3>Crude inventories were measuring the decade, not the market</h3>
+        <p>
+            My first specification included crude stock deviations. Colour-coding the scatter by year showed a literal gap in the middle of the variable's range, and a physical quantity doesn't have a hole in it. US crude inventories trend hard across this sample thanks to the shale build and then the SPR drawdown, so a lagging seasonal benchmark made entire eras read as permanent deficit or permanent surplus. The variable had turned into an era indicator. I dropped it. It also has weak economic footing here anyway, since the 3-2-1 crack already differences crude price out.
+        </p>
+
+        <h3>The seasonal norm was originally full-sample</h3>
+        <p>
+            Computing each week-of-year's benchmark from the entire sample let later years inform earlier ones. Over a 16-year window containing two structural shifts in storage levels, that distorted every deviation I had. Switching to a trailing five-year window fixed it, and it had the nice side effect of matching how the industry actually defines the number.
+        </p>
+
+        <h3>The surplus plateau was nearly a false discovery</h3>
+        <p>
+            In my first sample, which started in 2019, every surplus observation was also a COVID observation. Same rows. So "surplus flattens the response" and "2020 and 2021 were a different world" made identical predictions, and nothing I could run on that sample would separate them. Extending back to 2010 brought in the 2015 to 2019 shale glut as an independent surplus regime, and the plateau shows up in both. That's why I report the asymmetry as a finding rather than a curiosity, and it's why the short-window fit above is in the writeup instead of quietly deleted.
+        </p>
+
+        <h3>My prior on the dollar was wrong, and then the check undermined the alternative too</h3>
+        <p>
+            I expected roughly nothing, on the logic that FX should largely cancel in a spread between two dollar-denominated legs. The posterior came back at &minus;2.44, the second-largest effect in the model. Rather than take the win, I tested it, and found it entangled with the regime term at &rho; = &minus;0.74. So the honest conclusion isn't that the dollar matters more than I thought. It's that this sample can't tell me either way.
+        </p>
+    </section>
+
+    <section id="limitations">
+        <h2>Limitations</h2>
+
+        <h3>Residual autocorrelation</h3>
+        <p>
+            Weekly cracks are highly persistent and the residuals inherit that. It doesn't bias the coefficients, but it does mean the credible intervals above are narrower than they ought to be, because there's less independent information here than 575 rows suggests. An AR(1) error structure would handle this and it's the obvious next extension.
+        </p>
+
+        <h3>Endogenous utilization</h3>
+        <p>
+            Refiners run harder <em>because</em> margins are good. So the utilization coefficient is co-movement, not a lever, and it shouldn't be read causally no matter how tempting the sign is.
+        </p>
+
+        <h3>A hand-chosen breakpoint</h3>
+        <p>
+            I picked the regime date (1 March 2022) off the invasion and sanctions timeline rather than estimating it. Estimating a breakpoint properly is a harder problem I didn't attempt.
+        </p>
+
+        <h3>In-sample only</h3>
+        <p>
+            The 90% predictive interval covers 88.7% of observations, which is close to nominal. But that's in-sample, so it's a weak check. It doesn't validate the model, and I'd rather say so than let the number do work it hasn't earned.
+        </p>
+
+        <h3>&nu; sits near the variance boundary</h3>
+        <p>
+            At 3.55 in the full model and 2.78 in the reduced one, the fitted Student-t is close to the point where variance stops existing. The model is leaning very hard on heavy tails to accommodate 2022, which reads to me as the linear structure failing to explain that period rather than succeeding at it.
+        </p>
+
+        <h3>And the general one</h3>
+        <p>
+            This is a linear model of a nonlinear system, fit on eleven years that contain two structural breaks. It would fail on a refinery outage, a supply shock, or any regime it hasn't seen. Correlation in this case is evidence about structure.
+        </p>
+    </section>
+
+    <section>
+        <h2>Code</h2>
+        <p>
+            One script handles the whole pipeline: pulling and aligning the data, constructing the crack, building the features, fitting both specifications, and producing every figure on this page.
+        </p>
+        <p>
+            Running it needs an EIA API key, which is free and instant from <a href="https://www.eia.gov/opendata/" target="_blank">eia.gov/opendata</a>. Dependencies are <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>statsmodels</code>, <code>yfinance</code>, <code>pandas-datareader</code>, <code>requests</code>, <code>pymc</code>, <code>arviz</code>, and <code>numpyro</code>.
+        </p>
+        <p>
+            One note if you run this on macOS. PyTensor passes a linker flag that Xcode 15 and later removed, so the C backend fails to compile. The script disables it and samples through NumPyro instead, which sidesteps the problem and is faster anyway.
+        </p>
+        <a href="../documents/crack_oil_project.py" class="download-link" download>Download the Python Script</a>
+    </section>
+
+    <a href="../index.html" class="back-link">&larr; Back to Portfolio</a>
+    <script data-goatcounter="https://alangarcia.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js"></script>
+</body>
+</html>
+
