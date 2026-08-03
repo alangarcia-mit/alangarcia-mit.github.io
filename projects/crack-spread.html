@@ -423,7 +423,7 @@
 
         <h3>My prior on the dollar was wrong, and then the check undermined the alternative too</h3>
         <p>
-            I expected roughly nothing, on the logic that FX should largely cancel in a spread between two dollar-denominated legs. The posterior came back at &minus;2.44, the second-largest effect in the model. Rather than take the win, I tested it, and found it entangled with the regime term at &rho; = &minus;0.74. So the honest conclusion isn't that the dollar matters more than I thought. It's that this sample can't tell me either way.
+            I expected roughly nothing, on the logic that FX should largely cancel in a spread between two dollar-denominated legs. The posterior came back at &minus;2.44, the second-largest effect in the model. After testing it, I and found it entangled with the regime term at &rho; = &minus;0.74. So the honest conclusion isn't that the dollar matters more than I thought. It's that this sample can't tell me either way.
         </p>
     </section>
 
@@ -437,7 +437,7 @@
 
         <h3>Endogenous utilization</h3>
         <p>
-            Refiners run harder <em>because</em> margins are good. So the utilization coefficient is co-movement, not a lever, and it shouldn't be read causally no matter how tempting the sign is.
+            Refiners run harder <em>because</em> margins are good. So the utilization coefficient is co-movement, not a lever, and it shouldn't be read causally.
         </p>
 
         <h3>A hand-chosen breakpoint</h3>
@@ -470,7 +470,7 @@
             Running it needs an EIA API key, which is free and instant from <a href="https://www.eia.gov/opendata/" target="_blank">eia.gov/opendata</a>. Dependencies are <code>pandas</code>, <code>numpy</code>, <code>matplotlib</code>, <code>statsmodels</code>, <code>yfinance</code>, <code>pandas-datareader</code>, <code>requests</code>, <code>pymc</code>, <code>arviz</code>, and <code>numpyro</code>.
         </p>
         <p>
-            One note if you run this on macOS. PyTensor passes a linker flag that Xcode 15 and later removed, so the C backend fails to compile. The script disables it and samples through NumPyro instead, which sidesteps the problem and is faster anyway.
+            One note if you run this on macOS(At least for me). PyTensor passes a linker flag that Xcode 15 and later removed, so the C backend fails to compile. The script disables it and samples through NumPyro instead, which sidesteps the problem and is faster anyway.
         </p>
         <a href="../documents/crack_oil_project.py" class="download-link" download>Download the Python Script</a>
     </section>
